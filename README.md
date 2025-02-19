@@ -1,57 +1,91 @@
-# Projekt HandTone
+# HandTone
 
-**Cel projektu**
+## Table of Contents
+1. [Description](#description)
+2. [Concepts Used](#concepts-used)
+3. [Walkthrough](#walkthrough)
+4. [Setup](#setup)
 
-Mój projekt polega na stworzeniu modelu, który rozpoznaje konkretne gesty mojej ręki i przypisuje im odpowiednie nuty muzyczne, które są odtwarzane.
+## Description
+**HandTone** is a machine learning-based project that recognizes specific hand gestures and translates them into musical notes, which are then played back. Using **computer vision and audio synthesis**, the program detects hand gestures via a webcam and maps them to corresponding notes, allowing for an interactive musical experience.
 
-**Kolejność odpalania plików**
+## Concepts Used
+In this project, the following technologies and concepts are utilized:
+- **Computer Vision with MediaPipe**: Detects hand positions and extracts keypoints.
+- **Machine Learning with Random Forest Classifier**: Trains a model to classify hand gestures.
+- **Real-time Gesture Recognition**: Uses a webcam to recognize and respond to hand gestures dynamically.
+- **Audio Synthesis with Pygame & NumPy**: Generates musical tones based on classified gestures.
+- **Dataset Collection and Processing**: Captures images of hand gestures and converts them into training data.
+- **Key Mapping for Interaction**: Users can switch between octaves and waveforms using keyboard inputs.
 
-1. By samodzielnie wprowadzić swoje dane trzeba najpierw odpalić **collect_img.py.** Potem dla wybranych przez siebie ruchów powoli pokazywać na kamerce różne potencjalne perspektywy ich (na przykład zbliżać i oddalać rękę oraz wyginać ją w różne strony). Po odpaleniu programu powinnien powstać folder data, który będzie zawierał zdjęcia gestów.
+## Walkthrough
 
-2. Następnie musimy stworzyć sam dataset. Zrobimy to przez odpalenie pliku **create_dataset.py**. Po wykonaniu programu powinien powstać data.pickle.
+### 1. Collecting Gesture Data
+To create a dataset for gesture recognition, run **collect_img.py**. This script captures hand gestures through a webcam, saving images in the `data` folder.
 
-3. Następnie odpalamy plik **train_classifier.py** by wytrenować nasz classifier. Po wykonaniu powinien powstać plik model.p.
+![Gesture Collection](gesty.png)
 
-4. Teraz możemy odpalić nasz ukończony projekt. Robimy to za pomocą **inference_classifier.py**.
+- Users should slowly move their hand in various orientations to provide diverse training samples.
+- Ensure only one hand is visible for accurate classification.
 
-**Teoria Muzyczna**
+### 2. Creating the Dataset
+Run **create_dataset.py** to process the collected images and extract key hand landmarks.
+- This script uses **MediaPipe Hands** to detect hand keypoints.
+- The processed data is saved in `data.pickle` for training.
 
-Każda pojedyncza nuta ma swoją nazwę, a w tym projekcie będziemy korzystać z nazewnictwa z krzyżykami, także istotne są tylko **C, C#, D, D#, E, F, F#, G, G#, A, A# i H**. Nuty z krzyżykiem odczytujemy z końcówką "-is", więc mamy na przykład: fis, cis, gis, dis etc.
+### 3. Training the Classifier
+Run **train_classifier.py** to train a machine learning model using the collected dataset.
+- The script uses a **Random Forest Classifier** from `sklearn`.
+- The trained model is saved as `model.p`.
 
-![nazwy nut na klawiszach pianina](keys.jpg)
+### 4. Running the HandTone Program
+Run **inference_classifier.py** to start the real-time gesture-to-music conversion.
+- The script loads the trained model and continuously detects hand gestures.
+- Recognized gestures trigger corresponding musical notes.
+- Notes are played using **Pygame's audio engine**.
 
-Oktawa to odległość między kolejnymi takimi samymi dzwiękami na klawiaturze. Na zdjęciu powyżej widać przykład oktawy od C do C. Oznaczenie oktawy w odniesieniu do dźwięków, np. C4 lub B7, określa, jak wysoko lub nisko na klawiaturze jest dany dźwięk (w tym programie zaczynając każdą nową oktawę od C). W moim projekcie **można wybierać oktawy od 0 (najniższa) do 8 (najwyższa)**.
+### 5. Musical Theory & Controls
+HandTone supports the following musical notes: **C, C#, D, D#, E, F, F#, G, G#, A, A#, B**.
 
-Podstawowymi falami akustycznymi, od których zaczęła się synteza dźwięku, są **cztery rodzaje fal**. W moim projekcie można wybrać, którą z nich chcesz usłyszeć:
+![Piano Key Mapping](keys.jpg)
 
-![wygląd 4 rodzajów fal akustycznych](wave_forms_4.jpg)
+- **Octave Selection:** Press keys **0–8** to switch octaves.
+- **Waveform Selection:** Choose from four types of waveforms:
 
-**Obsługa programu**
+  | Key | Waveform  |
+  |----|-----------|
+  | Z  | Sawtooth  |
+  | X  | Square    |
+  | C  | Sine      |
+  | V  | Triangle  |
 
-![zdjęcia gestów](gesty.png)
+- **Predefined Sound Patches:**
 
-Do wybierania dźwięku używamy odpowiednich gestów dłonią. Ważne jest, aby podczas korzystania z programu była widoczna tylko **jedna ręka**. W przeciwnym razie program może być mniej trafny.
+  | Key | Waveform | Octave |
+  |----|-----------|--------|
+  | A  | Sawtooth  | 4      |
+  | S  | Square    | 5      |
+  | D  | Sine      | 6      |
+  | F  | Triangle  | 7      |
 
-Aby zmienić oktawę, naciśnij klawisz od 0 do 8 na klawiaturze odpowiednio.
+- **Exit the Program:** Press **Q**.
 
-By zamkąć program naciśnij q na klawiaturze.
+## Setup
+To set up and run HandTone, follow these steps:
 
-Aby zmienić rodzaj fali, naciśnij odpowiedni klawisz na klawiaturze:
+1. Install the required dependencies:
+   ```sh
+   pip install opencv-python mediapipe numpy pygame scikit-learn matplotlib
+   ```
+2. Run the scripts in the following order:
+   ```sh
+   python collect_img.py   # Collect hand gesture images
+   python create_dataset.py   # Process the dataset
+   python train_classifier.py   # Train the model
+   python inference_classifier.py   # Start real-time gesture recognition
+   ```
+3. Ensure the webcam is working and place your hand in front of the camera to play music!
 
-| Klawisz do naciśnięcia | Rodzaj fali |
-| ---------------------- | ----------- |
-| z                      | sawtooth    |
-| x                      | square      |
-| c                      | sine        |
-| v                      | triangle    |
+---
 
-**Przygotowane patche:**
-
-Dla osób, które nie chcą samodzielnie podejmować decyzji, przygotowałam również 4 patche do przetestowania:
-
-| Klawisz do naciśnięcia | Rodzaj fali | Oktawa |
-| ---------------------- | ----------- | ------ |
-| a                      | sawtooth    | 4      |
-| s                      | square      | 5      |
-| d                      | sine        | 6      |
-| f                      | triangle    | 7      |
+Enjoy making music with HandTone! 🎶
